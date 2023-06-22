@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인공지능 색깔 테스트</title>
+</head>
+<body>
+    <div>인공지능 색깔 테스트</div>
+<div id="upload-area">
+    <input type="file" accept="image/*"onchange="redfile(this.files[0];)" />
+</div>
+<div id="loading-area" style="display:none;">
+  <span> - </span>
+  <br />
+  <span>인공지능 모델을 불러오는 중이입니다...</span>
+  </div>
+<div id="resuit-area" style="display:none;">
+    <img id="upload-image" src="#" alt="your image"  />
+    <div id='label-container'></div>
+
+</div>
+<div id="webcam-container"></div>
+<div id="label-container"></div>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script type="text/javascript">
+    
+    
+    const URL = "https://teachablemachine.withgoogle.com/models/WpNKR2JM2/";
+
+    let model, webcam, labelContainer, maxPredictions;
+    let isModelReady = false;
+    let image =document.getElementById("upload-image");
+    let loadingarea=document.getElementById("loading-area");
+    let resuitArea=document.getElementById("result-area");
+    const reader= new FileReader();
+    async function readFile(file) {
+     if (isModelReady=== false)  {
+        loadingArea.style.display = "block"
+      await init();
+      reader.readAsBinaryString(file);
+     }
+
+    }
+
+    reader.onload = async function(event) {
+        await image.setAttribute('src',event.target.result);
+        await predict();
+        loadingArea.style.display ="none";
+        resuitArea.style.display = "block";
+    };
+        
+    
+    
+    
+
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        
+        
+
+        
+     
+        labelContainer = document.getElementById("label-container");
+        for (let i = 0; i < maxPredictions; i++) { // and class labels
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    }
+
+    
+    
+
+    
+    async function predict() {
+        
+        const prediction = await model.predict(image); 
+        for (let i = 0; i< maxPredictions; i++) {
+            const classPredictidn =
+            prediction[i].className + ":" + prediction[i].probability.toFixed(2);  
+            labelContainer.childnodes[i].innerHDML= classPredictidn;
+        }
+        isModelReady= true;
+        
+         
+
+    }
+</script>
+
+</body>
+</html>
